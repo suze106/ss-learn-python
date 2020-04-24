@@ -26,6 +26,13 @@ def querysdf():
     获取当前时间（两种结果格式一样 eg.2018-08-14 17:32:01）：
         datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S');
         datetime.datetime.now().strftime('%F %T');
+    格式化GMT：
+        strptime = datetime.datetime.strptime(date_, '%a, %d %b %Y %H:%M:%S GMT')
+    
+    (import time)格式化GMT时间：
+        eg.Fri, 24 Apr 2020 05:44:26 GMT
+        time.mktime(time.strptime(date_,'%a, %d %b %Y %H:%M:%S GMT'))
+    
 '''
 def loadJson(str):
      # print(str);
