@@ -5,6 +5,14 @@ import pyautogui
 import json
 import pyautogui as pag
 
+'''
+    打包为exe:
+    pyinstaller -F "E:\workspace\own\ss-learn-python\ss-learn-python-script\\frame\mouse\MouseClick.py" -p "E:\workspace\own\ss-record\\venv\Lib\site-packages"
+    注意（pyinstaller版本）:
+        -p 指定的是该项目的python env，如果不指定的话，当执行EXE是有可能出现找不到模块的问题
+        -i 可指定图标 icon
+'''
+
 def getMouthPoint():
     x,y = pag.position()
     pos="Position:"+str(x).rjust(4)+','+str(y).rjust(4)
