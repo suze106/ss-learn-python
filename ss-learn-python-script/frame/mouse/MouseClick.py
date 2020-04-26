@@ -39,56 +39,27 @@ def domain(beginTime,endTime,points:list,clickRestTime):
     serverTime = theServerTime()#服务器的日期
     # time5 = serverTime+5000
     # intervalInSec = 1000/interval
-    lastLocalTime = 0
     curTime=0
     print("A \t"+str((serverTime%oneDay))+"\t"+str(beginTime*1000)+"\t"+str((serverTime%oneDay)>=(beginTime*1000)))
     print("B \t"+str((serverTime%oneDay))+"\t"+str(endTime*1000)+"\t"+str((serverTime%oneDay)<=(endTime*1000)))
-    interval = 5
-    if(endTime>beginTime):
-        interval = endTime-beginTime
-    else:
-        if beginTime==0:
-            if endTime==0:
-                interval=5
-            else:
-                interval=endTime
+
+    while (serverTime%oneDay)>=(beginTime*1000) and (serverTime%oneDay)<=(endTime*1000):
+        if curTime==serverTime:
+            # if intervalInSec<(curLocalTime-lastLocalTime):
+            # print("执行时间"+str(serverTime))
+            clickTarget(points,clickRestTime)
+            localtime = time.localtime(serverTime/1000)
+            formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
+            print("执行时间"+formatTime)
         else:
-            if endTime==0:
-                interval=oneDay/1000-beginTime
-            else:
-                interval = oneDay/1000-beginTime+endTime
+            curTime = serverTime
+            clickTarget(points,clickRestTime)
+            localtime = time.localtime(serverTime/1000)
+            formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
+            print("执行时间"+formatTime)
 
-    curLocalTime = int(datetime.datetime.now().timestamp()*1000)
-    endTag = curLocalTime+(interval*1000)%oneDay
-    slp = interval-1
-    curDayst = curLocalTime%oneDay
-
-    #没写完
-
-    while (serverTime%oneDay)<(beginTime*1000) or (curLocalTime%oneDay)>(endTag):
-        if slp!=0:
-            time.sleep(slp)
-            slp=0
-        # while serverTime<=time5:
-    curLocalTime = int(datetime.datetime.now().timestamp()*1000)
-    if curTime==serverTime:
-        # if intervalInSec<(curLocalTime-lastLocalTime):
-        lastLocalTime=curLocalTime
-        # print("执行时间"+str(serverTime))
-        clickTarget(points,clickRestTime)
-        localtime = time.localtime(serverTime/1000)
-        formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
-        print("执行时间"+formatTime)
-    else:
-        curTime = serverTime
-        lastLocalTime=curLocalTime
-        clickTarget(points,clickRestTime)
-        localtime = time.localtime(serverTime/1000)
-        formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
-        print("执行时间"+formatTime)
-
-    serverTime=theServerTime()
-    print("============================================")
+        serverTime=theServerTime()
+        print("============================================")
 
 def loadParam(params):
     # params = '{"beginTime":"86399","endTime":"300","point":[{"index":1,"x":"110","y":"110"},{"index":2,"x":"130","y":"140"},{"index":3,"x":"170","y":"170"}]}'
