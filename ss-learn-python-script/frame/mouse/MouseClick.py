@@ -36,28 +36,51 @@ def theServerTime():
 
 def domain(beginTime,endTime,points:list,clickRestTime):
     oneDay = 60*60*24*1000#一天的时间
-    serverTime = theServerTime()#服务器的日期
+    # serverTime = theServerTime()#服务器的日期
     # time5 = serverTime+5000
     # intervalInSec = 1000/interval
-    curTime=0
+    # curTime=0
+
+    #等待到执行时间
+    # sysTime = datetime.datetime.now().timestamp()
+    #加八小时是因为时区问题造成时间戳会少八小时
+    sysTime = int(time.time()*1000)+int(oneDay/3)
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    todayNowTime = int(sysTime%oneDay);
+    # todayNowTime = 5%oneDay
+    slp = 0
+    if todayNowTime<(beginTime*1000):
+        slp=(beginTime*1000)-todayNowTime
+    elif todayNowTime>(beginTime*1000):
+        slp=(beginTime*1000)+(oneDay/1000)-todayNowTime
+    slp = slp/1000
+    while slp>=1:
+        if slp==1:
+            curNowTime = datetime.datetime.now().timestamp()%(oneDay/1000)
+            if curNowTime==beginTime:
+                slp=0
+        else:
+            print("等待:"+str(slp)+"s")
+            time.sleep(slp)
+            slp=1
+
+    serverTime=theServerTime()
     print("A \t"+str((serverTime%oneDay))+"\t"+str(beginTime*1000)+"\t"+str((serverTime%oneDay)>=(beginTime*1000)))
     print("B \t"+str((serverTime%oneDay))+"\t"+str(endTime*1000)+"\t"+str((serverTime%oneDay)<=(endTime*1000)))
-
     while (serverTime%oneDay)>=(beginTime*1000) and (serverTime%oneDay)<=(endTime*1000):
-        if curTime==serverTime:
-            # if intervalInSec<(curLocalTime-lastLocalTime):
-            # print("执行时间"+str(serverTime))
-            clickTarget(points,clickRestTime)
-            localtime = time.localtime(serverTime/1000)
-            formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
-            print("执行时间"+formatTime)
-        else:
-            curTime = serverTime
-            clickTarget(points,clickRestTime)
-            localtime = time.localtime(serverTime/1000)
-            formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
-            print("执行时间"+formatTime)
-
+        # if curTime==serverTime:
+        #     # if intervalInSec<(curLocalTime-lastLocalTime):
+        #     # print("执行时间"+str(serverTime))
+        #     clickTarget(points,clickRestTime)
+        #     localtime = time.localtime(serverTime/1000)
+        #     formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
+        #     print("执行时间"+formatTime)
+        # else:
+        #     curTime = serverTime
+        clickTarget(points,clickRestTime)
+        localtime = time.localtime(serverTime/1000)
+        formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
+        print("执行时间"+formatTime)
         serverTime=theServerTime()
         print("============================================")
 
