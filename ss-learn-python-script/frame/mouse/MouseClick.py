@@ -6,10 +6,9 @@ import json
 import pyautogui as pag
 
 def getMouthPoint():
-    while True:
-        x,y = pag.position()
-        pos="Position:"+str(x).rjust(4)+','+str(y).rjust(4)
-        print(pos)
+    x,y = pag.position()
+    pos="Position:"+str(x).rjust(4)+','+str(y).rjust(4)
+    print(pos)
 
 def sortFunc(elem):
     return int(elem.get("index"))
@@ -35,33 +34,61 @@ def theServerTime():
     except BaseException:
         return theServerTime();
 
-def domain(beginTime,endTime,points:list,interval,clickRestTime):
+def domain(beginTime,endTime,points:list,clickRestTime):
     oneDay = 60*60*24*1000#一天的时间
     serverTime = theServerTime()#服务器的日期
-    time5 = serverTime+5000
-    intervalInSec = 1000/interval
+    # time5 = serverTime+5000
+    # intervalInSec = 1000/interval
     lastLocalTime = 0
     curTime=0
-    while time%oneDay>=beginTime*100 or time%oneDay<=endTime:
-        while serverTime<=time5:
-            curLocalTime = int(datetime.datetime.now().timestamp()*1000)
-            if curTime==serverTime:
-                if intervalInSec<(curLocalTime-lastLocalTime):
-                    lastLocalTime=curLocalTime
-                    # print("执行时间"+str(serverTime))
-                    clickTarget(points,clickRestTime)
-                    localtime = time.localtime(serverTime/1000)
-                    formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
-                    print("执行时间"+formatTime)
+    print("A \t"+str((serverTime%oneDay))+"\t"+str(beginTime*1000)+"\t"+str((serverTime%oneDay)>=(beginTime*1000)))
+    print("B \t"+str((serverTime%oneDay))+"\t"+str(endTime*1000)+"\t"+str((serverTime%oneDay)<=(endTime*1000)))
+    interval = 5
+    if(endTime>beginTime):
+        interval = endTime-beginTime
+    else:
+        if beginTime==0:
+            if endTime==0:
+                interval=5
             else:
-                curTime = serverTime
-                lastLocalTime=curLocalTime
-                clickTarget(points,clickRestTime)
-                localtime = time.localtime(serverTime/1000)
-                formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
-                print("执行时间"+formatTime)
+                interval=endTime
+        else:
+            if endTime==0:
+                interval=oneDay/1000-beginTime
+            else:
+                interval = oneDay/1000-beginTime+endTime
 
-            serverTime=theServerTime()
+    curLocalTime = int(datetime.datetime.now().timestamp()*1000)
+    endTag = curLocalTime+(interval*1000)%oneDay
+    slp = interval-1
+    curDayst = curLocalTime%oneDay
+
+    #没写完
+
+    while (serverTime%oneDay)<(beginTime*1000) or (curLocalTime%oneDay)>(endTag):
+        if slp!=0:
+            time.sleep(slp)
+            slp=0
+        # while serverTime<=time5:
+    curLocalTime = int(datetime.datetime.now().timestamp()*1000)
+    if curTime==serverTime:
+        # if intervalInSec<(curLocalTime-lastLocalTime):
+        lastLocalTime=curLocalTime
+        # print("执行时间"+str(serverTime))
+        clickTarget(points,clickRestTime)
+        localtime = time.localtime(serverTime/1000)
+        formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
+        print("执行时间"+formatTime)
+    else:
+        curTime = serverTime
+        lastLocalTime=curLocalTime
+        clickTarget(points,clickRestTime)
+        localtime = time.localtime(serverTime/1000)
+        formatTime = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
+        print("执行时间"+formatTime)
+
+    serverTime=theServerTime()
+    print("============================================")
 
 def loadParam(params):
     # params = '{"beginTime":"86399","endTime":"300","point":[{"index":1,"x":"110","y":"110"},{"index":2,"x":"130","y":"140"},{"index":3,"x":"170","y":"170"}]}'
@@ -71,17 +98,18 @@ def loadParam(params):
 def portal():
     try:
         params = input("请输入：")
-        if params== '1':
+        if params== '0':
             getMouthPoint()
         else:
             clickRestTime = input("请输入每秒最大频次：")
             beginTime,endTime,point = loadParam(params)
-            domain(beginTime,endTime,point,5,clickRestTime)
+            domain(beginTime,endTime,point,clickRestTime)
+
         print("本次执行结束")
         print()
     except BaseException as e:
         print('取值范围不正确，或者JSON格式错误。'+str(e))
-        print('取值范围有：\r\n\t1 或 JSON字符串。')
+        print('取值范围有：\r\n\t0 或 JSON字符串。')
         print('\t\t1:获取鼠标坐标。')
         print('\t\tJSON模板:{"beginTime":"86399","endTime":"300","point":[{"index":1,"x":"110","y":"110"},{"index":2,"x":"130","y":"140"},{"index":3,"x":"170","y":"170"}]}')
         portal()
